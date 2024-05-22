@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript Game 3 - with Timer</title>
+<style>
+    
+    body {
+        margin: 0;
+        overflow: hidden;
+    }
+    #player {
+        position: absolute;
+        left: 50; /* Set initial left position */
+        top: 50%; /* Set initial top position */
+        transform: translateY(-50%);
+    }
+    .bullet {
+        position: absolute;
+        background-color: red;
+        width: 20px;
+        height: 10px;
+    }
+    .block {
+        position: absolute;
+        background-color: green;
+        width: 10px;
+        height: 5px;
+    }
+    #score-popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px;
+        background-color: springgreen;
+        border: 2px solid #000;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        z-index: 9999;
+    }
+    
+</style>
+</head>
+<body>
+    
+<img id="player" src="data:image/jpeg;base64,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" width="150" height="150">
+<div id="score-popup"></div>
+<script>
+// Declare interval variables outside the DOMContentLoaded event listener
+var createBulletInterval;
+var moveBulletInterval;
+var createBlockInterval;
+var moveBlockInterval;
+
+document.addEventListener('DOMContentLoaded', function() {
+    var player = document.getElementById('player');
+    var playerTop = player.offsetTop; // Initial top position
+    var playerLeft = player.offsetLeft; // Initial left position
+    var playerSpeed = 99; // Player speed
+    var bulletSpeed = 100; // Bullet speed
+    var blockSpeed = 1; // Block speed
+    var bullets = [];
+    var blocks = [];
+    var score = 0;
+    var questions = [
+        { question: 'What is 8473563873 + 74652936748?', answer: '83,126,500,621' },
+        { question: 'What is 2 * 75464276?', answer: '150,928,552' },
+        { question: 'What is 90372562 / 937352?', answer: '96.412619805579974225264361733906' },
+        { question: 'What is 936253 - 8362376?', answer: '-7,426,123' },
+        { question: 'What is 09383673 * 093736?', answer: '879,587,972,328' }
+    ];
+
+    function movePlayer(direction) {
+        switch(direction) {
+            case 'up':
+                if (playerTop > 0) {
+                    playerTop -= playerSpeed;
+                }
+                break;
+            case 'down':
+                if (playerTop < window.innerHeight - player.offsetHeight) {
+                    playerTop += playerSpeed;
+                }
+                break;
+            case 'right':
+                if (playerLeft < window.innerWidth - player.offsetWidth) {
+                    playerLeft += playerSpeed;
+                }
+                break;
+            case 'left':
+                if (playerLeft > 0) {
+                    playerLeft -= playerSpeed;
+                }
+                break;
+        }
+        player.style.top = playerTop + 'px';
+        player.style.left = playerLeft + 'px';
+    }
+
+    function createBullet() {
+        var bullet = document.createElement('div');
+        bullet.className = 'bullet';
+        bullet.style.top = (Math.random() * (window.innerHeight - bullet.offsetHeight)) + 'px';
+        bullet.style.left = window.innerWidth + 'px';
+        document.body.appendChild(bullet);
+        bullets.push(bullet);
+    }
+
+    function createBlock() {
+        var block = document.createElement('div');
+        block.className = 'block';
+        block.style.top = (Math.random() * (window.innerHeight - block.offsetHeight)) + 'px';
+        block.style.left = window.innerWidth + 'px';
+        document.body.appendChild(block);
+        blocks.push(block);
+    }
+
+    function moveObjects(objects, speed) {
+        objects.forEach(function(object, index) {
+            var objectLeft = object.offsetLeft;
+            objectLeft -= speed;
+            object.style.left = objectLeft + 'px';
+
+            // Check for collision with player
+            if (isColliding(player, object)) {
+                // Player got hit
+                if (object.className === 'bullet') {
+                    score--;
+                } else if (object.className === 'block') {
+                    askQuestion();
+                }
+                document.getElementById('score').innerText = 'Score: ' + score;
+                object.remove();
+                objects.splice(index, 1);
+            }
+
+            // Remove objects that go out of the screen
+            if (objectLeft < 0) {
+                object.remove();
+                objects.splice(index, 1);
+            }
+        });
+    }
+
+    function isColliding(element1, element2) {
+        var rect1 = element1.getBoundingClientRect();
+        var rect2 = element2.getBoundingClientRect();
+        return !(rect1.right < rect2.left || 
+                 rect1.left > rect2.right || 
+                 rect1.bottom < rect2.top || 
+                 rect1.top > rect2.bottom);
+    }
+
+    function askQuestion() {
+        var randomIndex = Math.floor(Math.random() * questions.length);
+        var question = questions[randomIndex].question;
+        var answer = prompt(question);
+        if (answer === questions[randomIndex].answer) {
+            score += 1;
+            document.getElementById('score').innerText = 'Score: '
+            + score;
+        }
+    }
+
+    document.addEventListener('keydown', function(event) {
+        switch(event.key) {
+            case 'ArrowUp':
+                movePlayer('down');
+                break;
+            case 'ArrowDown':
+                movePlayer('down');
+                break;
+            case 'ArrowRight':
+                movePlayer('up');
+                break;
+            case 'ArrowLeft':
+                movePlayer('right');
+                break;
+        }
+    });
+    document.addEventListener('keydown', function(event) {
+        switch(event.key) {
+            case 'w':
+                movePlayer('up');
+                break;
+            case 's':
+                movePlayer('down');
+                break;
+            case 'd':
+                movePlayer('right');
+                break;
+            case 'a':
+                movePlayer('left');
+                break;
+        }
+    });
+    createBulletInterval = setInterval(createBullet, 500); // Create bullets every 1 seconds
+    createBlockInterval = setInterval(createBlock, 1000); // Create blocks every 1 second
+    moveBulletInterval = setInterval(function() {
+        moveObjects(bullets, bulletSpeed); // Move bullets
+    }, 20); // Move bullets every 20 milliseconds
+    moveBlockInterval = setInterval(function() {
+        moveObjects(blocks, blockSpeed); // Move blocks
+    }, 20); // Move blocks every 20 milliseconds
+
+    // Timer for 30 seconds
+    setTimeout(function() {
+        clearInterval(createBulletInterval); // Stop creating bullets
+        clearInterval(createBlockInterval); // Stop creating blocks
+        clearInterval(moveBulletInterval); // Stop moving bullets
+        clearInterval(moveBlockInterval); // Stop moving blocks
+
+        // Display high score popup
+        var scorePopup = document.getElementById('score-popup');
+        scorePopup.style.display = 'block';
+        scorePopup.innerText = 'High Score\n\nYour Score: ' + score;
+    }, 20000); // 20 seconds
+});
+</script>
+<p id="score">Score: 0</p>
+</body>
+    <style>
+        background-color: green;
+    </style>
+</html>
